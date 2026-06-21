@@ -3,44 +3,45 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Client {
-  id          String   @id @default(cuid())
+  id          String          @id @default(uuid())
   name        String
-  email       String   @unique
+  email       String          @unique
   phone       String?
   company     String?
-  status      String   @default("active") // active, inactive, lead
-  value       Float    @default(0)
+  status      String          @default("active")
+  value       Float           @default(0)
   notes       String?
   avatar      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   histories   ClientHistory[]
   events      Event[]
 }
 
 model ClientHistory {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   clientId    String
   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  action      String   // created, updated, contacted, deal_closed, note_added
+  action      String
   description String
-  metadata    String?  // JSON string for extra data
+  metadata    String?
   createdAt   DateTime @default(now())
 }
 
 model Lead {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String
   email       String
   phone       String?
   company     String?
-  source      String   @default("website") // website, referral, linkedin, conference, email
-  status      String   @default("new") // new, contacted, qualified, converted, lost
-  score       Int      @default(50) // 0-100
+  source      String   @default("website")
+  status      String   @default("new")
+  score       Int      @default(50)
   value       Float    @default(0)
   notes       String?
   createdAt   DateTime @default(now())
@@ -48,69 +49,69 @@ model Lead {
 }
 
 model Task {
-  id          String   @id @default(cuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
-  status      String   @default("todo") // todo, in_progress, review, done
-  category    String   @default("general") // content, sales, event, general
-  priority    String   @default("medium") // low, medium, high, urgent
+  status      String    @default("todo")
+  category    String    @default("general")
+  priority    String    @default("medium")
   dueDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Reminder {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   title       String
   description String?
   dueDate     DateTime
   isRead      Boolean  @default(false)
-  priority    String   @default("medium") // low, medium, high
+  priority    String   @default("medium")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model Content {
-  id          String   @id @default(cuid())
+  id          String    @id @default(uuid())
   title       String
-  body        String   @default("")
-  type        String   @default("social_media") // newsletter, social_media, blog, ad_copy, event_content
-  platform    String   @default("linkedin") // linkedin, twitter, instagram, email, blog
-  status      String   @default("draft") // draft, scheduled, published
+  body        String    @default("")
+  type        String    @default("social_media")
+  platform    String    @default("linkedin")
+  status      String    @default("draft")
   scheduledAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Event {
-  id          String   @id @default(cuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
-  type        String   @default("meeting") // meeting, webinar, conference, campaign
-  location    String   @default("virtual")
-  status      String   @default("scheduled") // scheduled, in_progress, completed, cancelled
+  type        String    @default("meeting")
+  location    String    @default("virtual")
+  status      String    @default("scheduled")
   startDate   DateTime
   endDate     DateTime?
   clientId    String?
-  client      Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  client      Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Report {
-  id          String   @id @default(cuid())
+  id         String   @id @default(uuid())
   title      String
-  type       String   @default("weekly") // weekly, monthly
-  metrics    String   @default("{}") // JSON string for metrics data
+  type       String   @default("weekly")
+  metrics    String   @default("{}")
   startDate  DateTime
   endDate    DateTime
   createdAt  DateTime @default(now())
 }
 
 model Activity {
-  id          String   @id @default(cuid())
-  type        String   // created, updated, completed, deleted
-  entity      String   // client, lead, task, content, event, reminder
+  id          String   @id @default(uuid())
+  type        String
+  entity      String
   entityId    String?
   description String
   createdAt   DateTime @default(now())
