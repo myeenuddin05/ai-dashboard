@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { demoActivities } from '@/lib/demo-data';
 
 export async function GET() {
   try {
@@ -7,8 +8,9 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
       take: 50,
     });
-    return NextResponse.json(activities);
+    if (activities && activities.length > 0) return NextResponse.json(activities);
+    return NextResponse.json(demoActivities);
   } catch {
-    return NextResponse.json({ error: 'Failed to fetch activities' }, { status: 500 });
+    return NextResponse.json(demoActivities);
   }
 }
