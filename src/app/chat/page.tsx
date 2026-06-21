@@ -184,13 +184,13 @@ export default function ChatPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight">AI Agent Chat</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              {provider === 'huggingface' ? (
+              {provider && provider !== 'fallback' ? (
                 <span className="inline-flex items-center gap-1 text-teal-600 dark:text-teal-400">
                   <CheckCircle2 className="h-3 w-3" />
-                  Connected to Hugging Face
+                  Connected — {provider.toUpperCase()}
                 </span>
               ) : (
-                'Offline fallback mode'
+                'Offline fallback — set AI_PROVIDER in .env'
               )}
             </p>
           </div>
@@ -203,53 +203,71 @@ export default function ChatPage() {
                 {keySaved ? 'HF Key Set' : 'Set API Key'}
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-lg">
               <DialogHeader>
-                <DialogTitle>Hugging Face API Settings</DialogTitle>
+                <DialogTitle>AI Provider Settings</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 pt-2">
-                <div className="text-sm text-muted-foreground">
-                  <p>Get your free API token at{' '}
-                    <a
-                      href="https://huggingface.co/settings/tokens"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-teal-600 hover:underline inline-flex items-center gap-1"
-                    >
-                      huggingface.co/settings/tokens
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </p>
-                  <p className="mt-2 text-xs">
-                    Free tier includes rate-limited access to models like Mistral, Gemma, and Phi-3.
-                    No credit card required.
-                  </p>
+              <div className="space-y-4 pt-2 text-sm">
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="font-medium mb-1">Configure via <code className="bg-muted px-1 rounded text-xs">.env</code> or Vercel env vars:</p>
+                  <pre className="text-xs mt-2 bg-background rounded p-2 overflow-x-auto">
+{`AI_PROVIDER=huggingface  # or: openai, gemini, ollama, openrouter
+
+# Hugging Face (free)
+HF_API_KEY=hf_...
+HF_MODEL=mistralai/Mistral-7B-Instruct-v0.3
+
+# OpenAI
+# OPENAI_API_KEY=sk-...
+# OPENAI_MODEL=gpt-4o-mini
+
+# Gemini (free tier)
+# GEMINI_API_KEY=AIza...
+# GEMINI_MODEL=gemini-2.0-flash
+
+# Ollama (local)
+# OLLAMA_HOST=http://localhost:11434
+# OLLAMA_MODEL=llama3.2
+
+# OpenRouter (free models)
+# OPENROUTER_API_KEY=sk-or-...`}
+                  </pre>
                 </div>
-                <div className="flex gap-2">
-                  <Input
-                    type="password"
-                    value={hfKey}
-                    onChange={(e) => setHfKey(e.target.value)}
-                    placeholder="hf_xxxxxxxxxxxxxxxxxxxx"
-                    className="font-mono text-sm"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={saveKey} size="sm" className="bg-teal-600 hover:bg-teal-700">
-                    Save Key
-                  </Button>
-                  {keySaved && (
-                    <Button onClick={clearKey} variant="outline" size="sm">
-                      Remove Key
+
+                <div className="border-t pt-3">
+                  <p className="font-medium mb-1">Or paste a Hugging Face key for runtime use:</p>
+                  <div className="flex gap-2 mt-2">
+                    <Input
+                      type="password"
+                      value={hfKey}
+                      onChange={(e) => setHfKey(e.target.value)}
+                      placeholder="hf_xxxxxxxxxxxxxxxxxxxx"
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <Button onClick={saveKey} size="sm" className="bg-teal-600 hover:bg-teal-700">
+                      Save Key
                     </Button>
-                  )}
+                    {keySaved && (
+                      <Button onClick={clearKey} variant="outline" size="sm">
+                        Remove Key
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground border-t pt-3">
-                  <p className="font-medium mb-1">Current model:</p>
-                  <code className="bg-muted px-1 py-0.5 rounded text-xs">
-                    mistralai/Mistral-7B-Instruct-v0.3
-                  </code>
-                  <p className="mt-1">Change via <code className="bg-muted px-1 py-0.5 rounded text-xs">HF_MODEL</code> in <code className="bg-muted px-1 py-0.5 rounded text-xs">.env.local</code></p>
+
+                <div className="text-xs text-muted-foreground border-t pt-2">
+                  <span className="font-medium">Provider links:</span>{' '}
+                  <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">HuggingFace</a>
+                  {' · '}
+                  <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">OpenAI</a>
+                  {' · '}
+                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">Gemini</a>
+                  {' · '}
+                  <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">OpenRouter</a>
+                  {' · '}
+                  <a href="https://ollama.com" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">Ollama</a>
                 </div>
               </div>
             </DialogContent>
